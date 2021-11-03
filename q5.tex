@@ -1,0 +1,119 @@
+
+%%% Question 5 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+\question This question is about functors, applicative functors, and monads.
+\begin{parts} 
+	
+	\part[6] Define suitable instances of the \haskellIn{Functor}, \haskellIn{Applicative}, and \haskellIn{Monad} type classes for  \haskellIn{(->) r} (functions whose domain is some type \haskellIn{r}).  \emph{Hint}: it may be helpful to write down the specialised type signatures of the type class methods you need to define. \droppoints 
+	
+	\begin{solution} \emph{Application.} 1 mark for the \haskellIn{Functor} instance, 2 marks for the \haskellIn{Applicative} instance, and 3 marks for the \haskellIn{Monad} instance.
+	\begin{verbatim}
+	instance Functor ((->) r) where 
+	  fmap = (.)
+	  
+	instance Applicative ((->) r) where 
+	  pure = const 
+	  
+	  f <*> g = \x -> f x (g x)
+	  
+	instance Monad ((->) r) where 
+	  f >>= k = \x -> k (f x) x
+	\end{verbatim}
+	\end{solution}
+
+	\part[2] With the help of a suitable example, explain what the effect of the \haskellIn{(->) r} monad is. \droppoints 
+	
+	\begin{solution}
+		\emph{Comprehension. 1 mark for an example and 1 mark for a description.} The effect of the \haskellIn{(->) r} monad is read-only state. I.e. it is the reader monad.
+	\end{solution}
+
+	\part[10] Prove that your instance of the \texttt{Monad} type class for \haskellIn{(->) r} obeys the monad laws. \droppoints
+	
+	\begin{solution}
+	\emph{Application. 2 marks for the left identity. 3 marks for the right identity. 5 marks for associativity.} We can prove left identity through simple equational reasoning to rewrite one side of the equation to the other:
+	\allowdisplaybreaks
+	\begin{displaymath}
+	\begin{array}{cl}
+	\expr{\mathit{return}~x \bind f}
+	\hint{Definition of $\mathit{return}$}
+	\expr{\mathit{const}~x \bind f}
+	\hint{Definition of $\bind$}
+	\expr{\lambda r \to f~(\mathit{const}~x~r)~r}
+	\hint{Applying $\mathit{const}$}
+	\expr{\lambda r \to f~x~r}
+	\hint{$\eta$-conversion}
+	\lastexpr{f~x}
+	\end{array}
+	\end{displaymath}
+	The proof for right identity is also just accomplished through simple, equational reasoning:
+	\begin{displaymath}
+	\begin{array}{cl}
+	\expr{m \bind \mathit{return}}
+	\hint{Definition of $\bind$}
+	\expr{\lambda r \to \mathit{return}~(m~r)~r}
+	\hint{Definition of $\mathit{return}$}
+	\expr{\lambda r \to \mathit{const}~(m~r)~r}
+	\hint{Applying $\mathit{const}$}
+	\expr{\lambda r \to m~r}
+	\hint{$\eta$-conversion}
+	\lastexpr{m}
+	\end{array}
+	\end{displaymath}
+	The proof for associativity is also just accomplished through equational reasoning:
+	\begin{displaymath}
+	\begin{array}{cl}
+	\expr{m \bind f) \bind g}
+	\hint{Definition of $\bind$}
+	\expr{(\lambda r \to f~(m~r)~r) \bind g}
+	\hint{Definition of $\bind$}
+	\expr{\lambda n \to g~((\lambda r \to f~(m~r)~r)~n)~n}
+	\hint{$\beta$-reduction}
+	\expr{\lambda n \to g~(f~(m~n)~n)~n}
+	\hint{$\beta$-reduction}
+	\expr{\lambda n \to (\lambda r \to g~(f~(m~n)~r)~r)~n}
+	\hint{Unapplying $\bind$}
+	\expr{\lambda n \to (f~(m~n) \bind g)~n}
+	\hint{$\beta$-reduction}
+	\expr{\lambda n \to (\lambda x \to f~x \bind g)~(m~n)~n}
+	\hint{Unapplying $\bind$}
+	\lastexpr{m \bind (\lambda x \to f~x \bind g)}
+	\end{array}
+	\end{displaymath}
+	\end{solution}
+
+	\part[4] Not all types that are functors are also applicative functors. Using a suitable example, explain why this is the case. \droppoints
+
+	\begin{solution}
+		\emph{Comprehension.} There are many possible examples, but a good example from the lectures is the \haskellIn{Writer} type which is easily a functor:
+		\begin{verbatim}
+		instance Functor (Writer w) where
+		   fmap f (MkWriter (x,o)) = MkWriter (f x, o)
+		\end{verbatim} 
+		However, it is not an applicative functor. In order for it to be an applicative functor, we need to be able to write a function:
+		\begin{verbatim}
+		pure :: a -> Writer w a 
+		\end{verbatim}
+		This required us to use the \haskellIn{MkWriter} constructor, which expects a pair of type \haskellIn{(a,w)} as argument. While we have a value of type \haskellIn{a} (the argument to \haskellIn{pure}), we do not have a value of type \haskellIn{w}. In general, there are two main reasons why types may not be an applicative functor: 
+		\begin{itemize}
+			\item It is not possible to write a suitable definition (as shown above)
+			\item It is possible to write a definition, but it does not obey the relevant laws
+		\end{itemize}
+	\end{solution}
+
+	\part[3] Haskell's \haskellIn{do}-notation is just syntactic sugar. Using a suitable example of a program written using the \haskellIn{do}-notation, explain what it translates to. \droppoints 
+
+	\begin{solution} \emph{Comprehension.} Haskell's \haskellIn{do}-notation is syntactic sugar for the \haskellIn{>>=} operator of the \haskellIn{Monad} type class. For example, consider the following program without \haskellIn{do}-notation
+	\begin{verbatim}
+	main :: IO ()
+	main = getLine >>= \n ->
+           getLine >>= \m -> 
+	       return (n++m)
+	\end{verbatim}
+	This could similarly be written using \haskellIn{do}-notation as:
+	\begin{verbatim}
+	main :: IO ()
+	main = do n <- getLine 
+	          m <- getLine
+	          return (n++m)
+	\end{verbatim}
+	\end{solution}
+\end{parts}

@@ -1,0 +1,192 @@
+\allowdisplaybreaks
+%%% Question 4 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+\question This question is about equational reasoning.
+\begin{parts}
+	
+	\part[4] A well known property of the \haskellIn{map} function in Haskell is map fusion which states that, for all functions \haskellIn{f} and \haskellIn{g} and for all lists \haskellIn{xs}, the following holds:
+	
+	\begin{center}
+		\haskellIn{map f (map g xs) == map (f . g) xs}
+	\end{center}
+
+	Using a suitable example, explain why this property would not be true if \haskellIn{f} or \haskellIn{g} were not pure functions. \droppoints
+	 
+	\begin{solution}
+	\emph{Comprehension.} The order in which \haskellIn{f} and \haskellIn{g} are called is different for the two expressions. In the case of \haskellIn{map f (map g xs)}, \haskellIn{g} is called for all elements in \haskellIn{xs} and then \haskellIn{f} is called for all elements in the resulting list. For, \haskellIn{map (f . g) xs}, \haskellIn{f} is called immediately after \haskellIn{g} for every element of \haskellIn{xs}. If, for example, \haskellIn{f} uses some global state (like a counter) to determine its result and modifies that counter, then the results will be different.
+	\end{solution}
+
+	\part[4] Suppose that natural numbers are defined as follows along with a function for addition of natural numbers:
+	\begin{small}
+		\begin{verbatim}
+		data Nat = Zero | Succ Nat
+		
+		add :: Nat -> Nat -> Nat 
+		add Zero     m = m 
+		add (Succ n) m = Succ (add n m)
+		\end{verbatim}
+	\end{small}
+
+	%\begin{subparts}
+		Addition should be an associative binary operation:   
+		\begin{center}
+			\haskellIn{add (add x y) z == add x (add y z)}
+		\end{center}
+		Prove that this property holds. \droppoints
+	
+		\begin{solution}
+			\emph{Application/Bookwork. 1 mark for base case. 3 marks for inductive step.} This property was proved in the lectures. The proof is as follows, by induction on $x$: 
+			\begin{displaymath}
+			\begin{array}{cl}
+			\expr{\mathit{add}~\mathit{Zero}~(\mathit{add~y~z})}
+			\hint{applying $\mathit{add}$}
+			\expr{\mathit{add~y~z}}
+			\hint{unapplying $\mathit{add}$}
+			\lastexpr{\mathit{add}~(\mathit{add}~\mathit{Zero}~y)~z}
+			\end{array}
+			\end{displaymath}
+			The inductive step is for $\mathit{Succ}~n$:
+			\begin{displaymath}
+			\begin{array}{cl}
+			\expr{\mathit{add}~(\mathit{Succ}~x)~(\mathit{add~y~z})}
+			\hint{applying $\mathit{add}$}
+			\expr{\mathit{Succ}~(\mathit{add}~x~(\mathit{add}~y~z))}
+			\hint{induction hypothesis}
+			\expr{\mathit{Succ}~(\mathit{add}~(\mathit{add}~x~y)~z)}
+			\hint{unapplying $\mathit{add}$}
+			\expr{(\mathit{add}~(\mathit{Succ}~\mathit{add}~x~y)~z)}
+			\hint{unapplying $\mathit{add}$}
+			\lastexpr{(\mathit{add}~(\mathit{add}~(\mathit{Succ}~x)~y)~z)}
+			\end{array}
+			\end{displaymath}
+		\end{solution}
+
+	\part[5] Consider the following property about \haskellIn{replicate} and \haskellIn{(++)}:
+	\begin{center}
+		\haskellIn{replicate n x ++ replicate m x == replicate (add n m) x}
+	\end{center}
+	Assume that \haskellIn{replicate} is defined as follows:
+	\begin{small}
+		\begin{verbatim}
+		replicate :: Nat -> a -> [a]
+		replicate Zero     x = []
+		replicate (Succ n) x = x : replicate n x
+		\end{verbatim}
+	\end{small}
+	Prove that the property shown above holds. \droppoints
+
+	\begin{solution}
+		\emph{Application.} The proof is by induction on $n$. The base case is for $\mathit{Zero}$:
+		\begin{displaymath}
+		\begin{array}{cl}
+		\expr{\mathit{replicate}~\mathit{Zero}~x \append \mathit{replicate}~m~x}
+		\hint{applying $\mathit{replicate}$}
+		\expr{\hslist{} \append \mathit{replicate}~m~x}
+		\hint{applying $\append$}
+		\expr{\mathit{replicate}~m~x}
+		\hint{unapplying $\mathit{add}$}
+		\lastexpr{\mathit{replicate}~(\mathit{add}~\mathit{Zero}~m)~x}
+		\end{array}
+		\end{displaymath}
+		The inductive case is for $\mathit{Succ}~n$:
+		\begin{displaymath}
+		\begin{array}{cl}
+		\expr{\mathit{replicate}~(\mathit{Succ}~n)~x \append \mathit{replicate}~m~x}
+		\hint{applying $\mathit{replicate}$}
+		\expr{(x : \mathit{replicate}~n~x) \append \mathit{replicate}~m~x}
+		\hint{applying $\append$}
+		\expr{x : (\mathit{replicate}~n~x \append \mathit{replicate}~m~x)}
+		\hint{induction hypothesis}
+		\expr{x : (\mathit{replicate}~(\mathit{add}~n~m)~x)}
+		\hint{unapplying $\mathit{replicate}$}
+		\expr{\mathit{replicate}~(\mathit{Succ}~(\mathit{add}~n~m))~x}
+		\hint{unapplying $\mathit{add}$}
+		\lastexpr{\mathit{replicate}~(\mathit{add}~(\mathit{Succ}~n)~m)~x}
+		\end{array}
+		\end{displaymath}
+	\end{solution}
+
+	\part[12] Prove the following property which states the length of concatenating a list of lists is the same as calculating the length of each individual list and then calculating the sum of the results:   
+	\begin{center}
+		\haskellIn{length (concat xss) == sum (map length xss)}
+	\end{center}
+	You may assume that the usual properties of integers and arithmetic operations on them have already been proved. \droppoints
+
+	\begin{solution}
+		\emph{Application.} This question has two proofs hidden in one and there are 6 marks available for each proof (2 for base case + 4 for inductive step each). 
+		
+		Let us begin with the proof for the property shown by induction on $\mathit{xss}$. The base case is for $\hslist{}$:
+		
+		\begin{displaymath}
+		\begin{array}{cl}
+		\expr{\mathit{length}~(\mathit{concat}~\hslist{})}
+		\hint{applying $\mathit{concat}$}
+		\expr{\mathit{length}~\hslist{}}
+		\hint{applying $\mathit{length}$}
+		\expr{0}
+		\hint{unapplying $\mathit{sum}$}
+		\expr{\mathit{sum}~\hslist{}}
+		\hint{unapplying $\mathit{map}~\mathit{length}$}
+		\lastexpr{\mathit{sum}~(\mathit{map}~\mathit{length}~\hslist{})}
+		\end{array}
+		\end{displaymath}
+		
+		Then we can prove the inductive case for $\mathit{xs}:\mathit{xss}$:
+		
+		\begin{displaymath}
+		\begin{array}{cl}
+		\expr{\mathit{length}~(\mathit{concat}~(\mathit{xs}:\mathit{xss}))}
+		\hint{applying $\mathit{concat}$}
+		\expr{\mathit{length}~(\mathit{xs} \append \mathit{concat}~\mathit{xss})}
+		\hint{lemma proved below}
+		\expr{\mathit{length}~\mathit{xs} + \mathit{length}~(\mathit{concat}~\mathit{xss})}
+		\hint{induction hypothesis}
+		\expr{\mathit{length}~\mathit{xs} + \mathit{sum}~(\mathit{map}~\mathit{length}~\mathit{xss})}
+		\hint{unapplying $\mathit{sum}$}
+		\expr{\mathit{sum}~(\mathit{length}~\mathit{xs} : \mathit{map}~\mathit{length}~\mathit{xss})}
+		\hint{unapplying $\mathit{map}~\mathit{length}$}
+		\lastexpr{\mathit{sum}~(\mathit{map}~\mathit{length}~(\mathit{xs}:\mathit{xss}))}
+		\end{array}
+		\end{displaymath}
+		
+		As shown in the proof above, a lemma about how $\mathit{length}$ distributes over $\append$ is required:
+		
+		\begin{center}
+			\begin{small}
+				\begin{verbatim}
+				length (xs ++ ys) == length xs + length ys
+				\end{verbatim}
+			\end{small}
+		\end{center}
+		
+		The proof is by induction on $\mathit{xs}$. First the base case for $\hslist{}$:
+		\begin{displaymath}
+		\begin{array}{cl}
+		\expr{\mathit{length}~(\hslist{} \append \mathit{ys})}
+		\hint{applying $\append$}
+		\expr{\mathit{length}~\mathit{ys}}
+		\hint{identity of addition}
+		\expr{0 + \mathit{length}~\mathit{ys}}
+		\hint{unapplying $\mathit{length}$}
+		\lastexpr{\mathit{length}~\hslist{} + \mathit{length}~\mathit{ys}}
+		\end{array}
+		\end{displaymath}
+		
+		Then the inductive case for $x:\mathit{xs}$:
+		
+		\begin{displaymath}
+		\begin{array}{cl}
+		\expr{\mathit{length}~((x:\mathit{xs}) \append \mathit{ys})}
+		\hint{applying $\append$}
+		\expr{\mathit{length}~(x : (\mathit{xs} \append \mathit{ys}))}
+		\hint{applying $\mathit{length}$}
+		\expr{1 + \mathit{length}~(\mathit{xs} \append \mathit{ys})}
+		\hint{induction hypothesis}
+		\expr{1 + \mathit{length}~\mathit{xs} + \mathit{length}~\mathit{ys}}
+		\hint{unapplying $\mathit{length}$}
+		\lastexpr{\mathit{length}~(x:\mathit{xs}) + \mathit{length}~\mathit{ys}}
+		\end{array}
+		\end{displaymath}
+		This concludes the proof.
+	\end{solution}
+	
+\end{parts}

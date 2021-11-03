@@ -1,0 +1,192 @@
+%%% Question 1 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+\question This question is about functional programming as a programming paradigm.
+\begin{parts}
+	
+	\part For each of the following Haskell expressions, reduce it to its normal form.
+	
+	\begin{subparts}
+		
+		\subpart[1] \haskellIn{head "Witter" : tail "Virus"} \droppoints 
+		
+		\begin{solution}
+		\emph{Comprehension.} \haskellIn{"Wirus"} 
+		\end{solution}
+	
+		\subpart[1] \haskellIn{take (fst (3,9002)) (repeat "Blue")}  \droppoints
+		
+		\begin{solution}
+		\emph{Comprehension.} \haskellIn{["Blue", "Blue", "Blue"]}
+		\end{solution}
+	
+		\subpart[1] \haskellIn{foldr (:) [] (Just 108)}  \droppoints
+		
+		\begin{solution}
+		\emph{Comprehension.} \haskellIn{[108]}
+		\end{solution}
+	
+		\subpart[1] \haskellIn{fmap (+2) (\x -> x*5) 4} \droppoints
+		
+		\begin{solution}
+		\emph{Comprehension.} \haskellIn{22}
+		\end{solution}
+	
+		\subpart[1] \haskellIn{foldl (\r x -> fmap (x:) r ++ r) [[]] "abc"} \droppoints
+		
+		\begin{solution}
+		\emph{Comprehension.}\\ \haskellIn{["cba","cb","ca","c","ba","b","a",""]}
+		\end{solution}
+	\end{subparts}
+	
+	\part For each of the following expressions, choose \emph{all} permissible types from the options that are listed. There is \emph{at least} one correct option for each expression.
+	
+	\begin{subparts}
+		
+    	\subpart[1] \haskellIn{show 24} \droppoints
+    	
+	    \begin{enumerate}
+	    	\item \haskellIn{[Char]}
+	    	\item \haskellIn{Show a => a -> String}
+	    	\item \haskellIn{(Show a, Num a) => a -> String}
+	    	\item \haskellIn{(Show a, Num a) => a -> [Char]}
+	    	\item \haskellIn{String}
+	    \end{enumerate}
+    
+		\begin{solution}
+			\emph{Comprehension.} 1,5
+		\end{solution}
+	
+    	\subpart[1] \haskellIn{[(1, "Angel Attack"), (2, "The Beast")]} \droppoints
+    	
+	    \begin{enumerate}
+	    	\item \haskellIn{Num a => [(a, String), (a, String)]}
+	    	\item \haskellIn{Num a => [(a, String)]}
+	    	\item \haskellIn{[(Int, String)]}
+	    	\item \haskellIn{[(Integer, String)]}
+	    	\item \haskellIn{Num a => [(a, [Char])]}
+	    \end{enumerate}
+    
+	    \begin{solution}
+	   		\emph{Comprehension.} 2,3,4,5
+	    \end{solution}
+    
+    	\ifprintanswers \pagebreak \else \fi
+    
+    	%\ifprintanswers \else \pagebreak \fi
+    	
+    	\subpart[1] \haskellIn{\a b c d -> a (b d) c} \droppoints
+    	
+	    \begin{enumerate}
+	    	\item \haskellIn{(a -> a -> a) -> (a -> a) -> a -> a -> a}
+	    	\item \haskellIn{(a -> b -> a) -> (d -> a) -> b -> d -> a}
+	    	\item \haskellIn{(d -> b -> c) -> (a -> d) -> b -> a -> c}
+	    	\item \haskellIn{(a -> a -> c) -> (d -> a) -> a -> d -> c}
+	    	\item \haskellIn{(a -> b -> c) -> (d -> a) -> b -> d -> c}
+	    \end{enumerate}
+    
+	    \begin{solution}
+	    	\emph{Comprehension.} 1,2,3,4,5
+	    \end{solution}
+    
+		\subpart[1] \haskellIn{\f -> fmap (f (fmap id)) []} \droppoints
+		
+		\begin{enumerate}
+			\item \haskellIn{Functor f => ((f b -> f c) -> a -> c) -> [c]}
+			\item \haskellIn{Functor f => ([b] -> [b] -> a -> c) -> f c}
+			\item \haskellIn{Functor f => (([b] -> [b]) -> a -> c) -> f c}
+			\item \haskellIn{Functor f => ((f b -> f b) -> a -> c) -> [c]}
+			\item \haskellIn{Functor f => ((f b -> f b) -> a -> c) -> f c}
+		\end{enumerate}
+	
+		\begin{solution}
+			\emph{Comprehension.} 4
+		\end{solution}
+	
+		%\ifprintanswers \pagebreak \else \fi
+		
+    	\subpart[1] \haskellIn{\f z xs -> foldr (\b g x -> g (f x b)) id xs z} \droppoints 
+    	
+	    \begin{enumerate}
+	    	\item \haskellIn{(a -> b -> a) -> a -> [b] -> a}
+	    	\item \haskellIn{(a -> b -> b) -> b -> [a] -> b}
+	    	\item \haskellIn{Foldable t => (a -> b -> b) -> b -> t a -> b}
+	    	\item \haskellIn{Foldable t => (b -> a -> b) -> b -> t a -> b}
+	    	\item \haskellIn{Foldable t => (b -> a -> c) -> b -> t a -> c}
+	    \end{enumerate}
+    
+	    \begin{solution}
+	    	\emph{Comprehension.} 1,4
+	    \end{solution}
+	\end{subparts}
+
+	\ifprintanswers \else \pagebreak \fi
+
+	\part[3] Consider the following definition of the list difference operator \haskellIn{(\\)}:
+	\begin{small}
+	\begin{verbatim}
+	(\\) :: Eq a => [a] -> [a] -> [a]
+	xs \\ []     = xs 
+	xs \\ (y:ys) = delete y (xs \\ ys)
+	\end{verbatim}
+	\end{small}
+	
+	Define a function \haskellIn{diff} which is equivalent to \haskellIn{(\\)}, but is defined using \haskellIn{foldl} instead of explicit recursion. \droppoints 
+	
+	\begin{solution}
+	\emph{Application.} One possible answer is:
+	\begin{verbatim}
+	diff = foldl (flip delete)
+	\end{verbatim}
+	\end{solution}
+\part  \label{part:sum}
+\begin{subparts}
+\subpart[3] \label{part:strict} Trace how \haskellIn{diff "abbc" "bd"} would be evaluated in a language with \emph{call-by-value} semantics. \droppoints
+\begin{solution}
+\emph{Comprehension.}
+\begin{small}
+\begin{verbatim}
+   diff "abbc" "bd"
+=> foldl (flip delete) "abbc" "bd"
+=> foldl (flip delete) (flip delete "abbc" 'b') "d"
+=> foldl (flip delete) "ac" "d"
+=> foldl (flip delete) (flip delete "ac" 'd') ""
+=> foldl (flip delete) "ac" ""
+=> "ac"
+\end{verbatim}
+\end{small}
+\end{solution}
+\subpart[3] \label{part:lazy} Trace how \haskellIn{diff "abbc" "bd"} would be evaluated in a language with \emph{call-by-name} semantics. You should assume that the value of this expression is required by some other part of the program. \droppoints
+\begin{solution} \emph{Comprehension.}
+\begin{small}
+\begin{verbatim}
+diff "abbc" "bd"
+=> foldl (flip delete) "abbc" "bd"
+=> foldl (flip delete) (flip delete "abbc" 'b') "d"
+=> foldl (flip delete) (flip delete 
+     (flip delete "abbc" 'b') 'd') ""
+=> flip delete (flip delete "abbc" 'b') 'd'
+=> flip delete "ac" 'd'
+=> "ac"
+\end{verbatim}
+\end{small}
+\end{solution}
+\subpart[6] Consider the following, well known definition which represents the infinite list of fibonacci numbers:
+\begin{small}
+	\begin{verbatim}
+	fibs :: [Integer]
+	fibs = 1 : 1 : zipWith (+) fibs (tail fibs)
+	\end{verbatim}
+\end{small}
+Using relevant terminology and with reference to \emph{sharing}, explain why $n$-many elements of this list can be computed in linear time with respect to $n$. \droppoints
+\begin{solution} \emph{Comprehension.}
+Definitions are represented by \emph{closures} (stored on the heap) and pointers to them are then passed to functions as arguments. Sharing is an optimisation which allows closures to be \emph{updated} with their result once they have been evaluated provided that the closure (definition) has no parameters, meaning they only have to be evaluated once. The Haskell compiler rewrites the above definition to something like:
+\begin{verbatim}
+fibs :: [Integer]
+fibs = let xs = 1 : ys 
+           ys = zipWith (+) fibs zs
+           zs = tail fibs
+       in 1 : xs
+\end{verbatim} 
+Each definition corresponds to a closure and none of them have any parameters. In particular, \haskellIn{ys} and \haskellIn{zs} can be updated with the results of evaluating their respective operations. Since variables are pointers to those closures, they will see the results once they have been evaluated once and do not need to perform the same work again.
+\end{solution}
+\end{subparts}
+\end{parts}

@@ -1,0 +1,67 @@
+%-----------------------------------------------------------
+% LaTeX template for University of Warwick exams
+%-----------------------------------------------------------
+
+\usepackage{fancyeq}
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+\makeatletter
+\expandafter\providecommand\expandafter*\csname ver@framed.sty\endcsname
+{2003/07/21 v0.8a Simulated by exam}
+\makeatother
+\usepackage{framed}
+\usepackage{xcolor}
+\usepackage{minted}
+\usepackage[
+backgroundcolor = white
+, hidealllines=true
+]{mdframed}
+
+\surroundwithmdframed{minted}
+\usemintedstyle{bw}
+
+\setminted[text]{fontsize=\small}
+\setminted[haskell]{fontsize=\small}
+\setminted[bash]{fontsize=\small}
+\newcommand{\haskellIn}[1]{\mintinline[fontsize=\small]{text}{#1}}
+\newcommand{\bashIn}[1]{\mintinline[fontsize=\small]{bash}{#1}}
+
+\usepackage[]{FiraSans}
+
+\usepackage{mathpazo}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{multicol}
+
+%\usepackage[nomap]{FiraMono}
+
+% configure the heading 
+\ModuleName{Functional Programming}
+\ExamPeriod{Summer 2019}
+\TimeAllowed{2 hours}
+\QuestionInstructions{Answer \textbf{FOUR} questions.}
+\OtherInstructions{Read carefully the instructions on the answer book and make sure that the particulars required are entered on \textbf{each} answer book. \\
+
+No calculators are allowed. A copy of the Haskell Prelude is given in the Appendix.}
+
+\usepackage[nomap]{FiraMono}
+
+\usepackage{microtype}
+\DisableLigatures[f]{encoding = *, family = tt* }
+
+\begin{document}
+	\MakeHeading
+	
+	\begin{questions}
+		\input{q1}
+		\input{q2} 
+		\input{q3}
+		\input{q4} 
+		\input{q5} 
+		\input{q6} 
+	\end{questions}
+
+	\pagebreak
+	\input{prelude}
+\end{document}
